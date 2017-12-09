@@ -1,8 +1,18 @@
-FROM kmallea/steamcmd:latest
-
+FROM ubuntu:14.04
 MAINTAINER Mikel Farley <Mikel@Farley.pro>
 
-RUN ./steamcmd.sh +login anonymous +force_install_dir /GameServer/Killing_Floor_2 +app_update 232130 validate +quit
+ENV DEBIAN_FRONTEND noninteractive
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y curl lib32gcc1
+
+# Download and extract SteamCMD
+RUN mkdir -p /opt/steamcmd && \
+    cd /opt/steamcmd && \
+    curl -s http://media.steampowered.com/installer/steamcmd_linux.tar.gz | tar -vxz
+
+RUN /opt/steamcmd/steamcmd.sh +login anonymous +force_install_dir /GameServer/Killing_Floor_2 +app_update 232130 validate +quit
 
 RUN timeout 20s /GameServer/Killing_Floor_2/Binaries/Win64/KFGameSteamServer.bin.x86_64 &1> /dev/null 2> /dev/null
 
